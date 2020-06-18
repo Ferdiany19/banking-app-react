@@ -1,12 +1,17 @@
-import { SIGN_IN, BASE_API_URL } from '../utils/constants';
+import { SIGN_IN, BASE_API_URL, SIGN_OUT } from '../utils/constants';
 import axios from 'axios';
 import { getErrors } from './errors';
 import { history } from '../router/AppRouter';
+import { setAuthHeader, removeAuthHeader } from '../utils/common';
 
 export const signIn = (user) => ({
     type: SIGN_IN,
     user
 });
+
+export const signOut = () => ({
+    type: SIGN_OUT
+})
 
 export const initiateLogin = (email, password) => {
     return async (dispatch) => {
@@ -26,6 +31,20 @@ export const initiateLogin = (email, password) => {
         }
     };
 };
+
+export const initiateLogout = () => {
+    return async (dispatch) => {
+        try {
+            // setAuthHeader();
+            await axios.post(`${BASE_API_URL}/logout`, true, true);
+            // removeAuthHeader();
+            localStorage.removeItem('user_token');
+            return dispatch(signOut());
+        } catch (error) {
+            error.response && dispatch(getErrors(error.response.data))
+        }
+    }
+}
 
 export const registerNewUser = (data) => {
     return async (dispatch) => {
